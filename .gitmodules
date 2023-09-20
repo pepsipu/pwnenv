@@ -1,0 +1,6 @@
+[submodule "lib/clap"]
+	path = lib/clap
+	url = https://github.com/Hejsil/zig-clap
+[submodule "lib/docker"]
+	path = lib/docker
+	url = https://github.com/nektro/zig-docker
