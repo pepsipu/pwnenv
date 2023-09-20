@@ -1,0 +1,19 @@
+[package]
+name = "pwnenv"
+version = "0.1.0"
+edition = "2021"
+description = "pwn environment management tool"
+
+# See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
+
+[dependencies]
+bollard = "0.15.0"
+clap = { version = "4.4.4", features = ["derive"] }
+dirs = "5.0.1"
+dockerfile = "0.2.1"
+futures = { version = "0.3.28", features = ["executor"] }
+lazy_static = "1.4.0"
+mktemp = "0.5.1"
+snafu = "0.7.5"
+tar = "0.4.40"
+tokio = { version = "1.32.0", features = ["full"] }
