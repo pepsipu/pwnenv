@@ -28,7 +28,7 @@ pub async fn list_images() -> Result<(), Whatever> {
     }
 }
 
-pub async fn build_docker(dockerfile: Dockerfile) -> Result<(), Whatever> {
+pub async fn build_docker(dockerfile: Dockerfile, image: &str) -> Result<(), Whatever> {
     // please ignore blatant toctou
     let path = mktemp::Temp::new_file().unwrap();
     let mut tmp = std::fs::File::create(&path).unwrap();
@@ -44,7 +44,7 @@ pub async fn build_docker(dockerfile: Dockerfile) -> Result<(), Whatever> {
     let mut build_image = crate::DOCKER.build_image(
         BuildImageOptions {
             dockerfile: "Dockerfile",
-            t: "goofball",
+            t: image,
             ..Default::default()
         },
         None,
@@ -61,23 +61,19 @@ pub async fn build_docker(dockerfile: Dockerfile) -> Result<(), Whatever> {
         }
     }
     Ok(())
-    // return build_image;
 }
 
-pub async fn launch_env() -> Result<(), Whatever> {
-    let build_stream = build_docker(make_dockerfile()).await;
-
-    let _ = crate::DOCKER
-        .remove_container("my_new_container", None)
-        .await;
+pub async fn launch_env(container: &str, image: &str) -> Result<(), Whatever> {
+    // ensure container doesn't exist
+    let _ = crate::DOCKER.remove_container(container, None).await;
 
     let options = Some(CreateContainerOptions {
-        name: "my_new_container",
+        name: container,
         platform: None,
     });
 
     let config = Config {
-        image: Some("goofball:latest"),
+        image: Some(image),
         // cmd: Some(vec!["/bin/bash"]),
         ..Default::default()
     };
