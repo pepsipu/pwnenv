@@ -65,6 +65,7 @@ pub async fn build_docker(dockerfile: Dockerfile, image: &str) -> Result<(), Wha
 
 pub async fn launch_env(container: &str, image: &str) -> Result<(), Whatever> {
     // ensure container doesn't exist
+    let _ = crate::DOCKER.stop_container(container, None).await;
     let _ = crate::DOCKER.remove_container(container, None).await;
 
     let options = Some(CreateContainerOptions {
@@ -74,7 +75,11 @@ pub async fn launch_env(container: &str, image: &str) -> Result<(), Whatever> {
 
     let config = Config {
         image: Some(image),
-        // cmd: Some(vec!["/bin/bash"]),
+        exposed_ports: Some({
+            let mut map = std::collections::HashMap::new();
+            map.insert("22/tcp", std::collections::HashMap::new());
+            map
+        }),
         ..Default::default()
     };
     let response = crate::DOCKER.create_container(options, config).await;

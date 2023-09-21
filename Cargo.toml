@@ -9,11 +9,13 @@ description = "pwn environment management tool"
 [dependencies]
 bollard = "0.15.0"
 clap = { version = "4.4.4", features = ["derive"] }
-dirs = "5.0.1"
+directories = "5.0.1"
 dockerfile = "0.2.1"
 futures = { version = "0.3.28", features = ["executor"] }
 lazy_static = "1.4.0"
 mktemp = "0.5.1"
+rand = "0.8.5"
 snafu = "0.7.5"
+ssh-key = { version = "0.6.1", features = ["ed25519"] }
 tar = "0.4.40"
 tokio = { version = "1.32.0", features = ["full"] }

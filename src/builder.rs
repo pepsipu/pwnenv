@@ -1,30 +1,33 @@
 use dockerfile::{Cmd, Dockerfile, DockerfileBuilder, Run};
+use ssh_key::private::{Ed25519Keypair, Ed25519PrivateKey};
+use rand::rngs::StdRng;
 
 struct Builder {
-    dockerfile: Option<DockerfileBuilder>,
+    dockerfile: DockerfileBuilder,
 }
 
 impl Builder {
     pub fn new(base: String) -> Self {
-        Self {
-            dockerfile: Some(Dockerfile::base(base)),
-        }
+        Builder { dockerfile: Dockerfile::base(base) }
     }
 
-    pub fn take_df(&mut self) -> DockerfileBuilder {
-        return self.dockerfile.take().unwrap();
-    }
-
-    pub fn add_ssh_server(&mut self) {
-        self.dockerfile = Some(
-            self.take_df()
+    pub fn emit_ssh_install(self) {
+            self.dockerfile
                 .push(Run::new("apt-get install openssh-server -y"))
-                .push(Run::new("mkdir /var/run/sshd")),
-        );
+                .push(Run::new("mkdir /var/run/sshd"));
     }
 
-    pub fn build(&mut self) -> Dockerfile {
-        return self.take_df().finish();
+    pub fn emit_ssh_cmd(self) {
+        self.dockerfile.push(Cmd::new("[\"/usr/sbin/sshd\", \"-D\"]"));
+    }
+
+    pub fn generate_ssh_key(self) {
+        let key = Ed25519Keypair::random(&mut rand::thread_rng());
+        key.public.to_string();
+    }
+
+    pub fn build(self) -> Dockerfile {
+        return self.dockerfile.finish();
     }
 }
 

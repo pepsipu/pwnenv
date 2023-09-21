@@ -2,6 +2,7 @@ pub mod builder;
 pub mod docker;
 pub mod opts;
 pub mod tools;
+pub mod config;
 
 #[macro_use]
 extern crate lazy_static;
