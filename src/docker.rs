@@ -1,63 +1,25 @@
-use std::io::Write;
-
 use bollard::container::{Config, CreateContainerOptions};
-use bollard::image::{BuildImageOptions, ListImagesOptions};
+use bollard::image::BuildImageOptions;
 
-use dockerfile::Dockerfile;
+use crate::builder;
 
 use futures::StreamExt;
-use mktemp;
-use snafu::{prelude::*, ResultExt, Whatever};
-use tar;
+use snafu::{prelude::*, Whatever};
 
-pub async fn list_images() -> Result<(), Whatever> {
-    let images = crate::DOCKER
-        .list_images(Some(ListImagesOptions::<String> {
-            all: true,
-            ..Default::default()
-        }))
-        .await;
-    match images {
-        Ok(images) => {
-            println!("{:?}", images);
-            Ok(())
-        }
-        Err(e) => {
-            whatever!("Failed to list images: {}", e)
-        }
-    }
-}
-
-pub async fn build_docker(dockerfile: Dockerfile, image: &str) -> Result<(), Whatever> {
-    // please ignore blatant toctou
-    let path = mktemp::Temp::new_file().unwrap();
-    let mut tmp = std::fs::File::create(&path).unwrap();
-    tmp.write_all(dockerfile.to_string().as_bytes()).unwrap();
-    let mut builder = tar::Builder::new(Vec::new());
-    println!("{:?}", dockerfile.to_string());
-    builder
-        .append_file("Dockerfile", &mut std::fs::File::open(&path).unwrap())
-        .unwrap();
-    builder.finish();
-    let tar = builder.into_inner().unwrap();
-    // println!("{:?}", tar);
+pub async fn build_docker(artifact: builder::Artifact) -> Result<(), Whatever> {
     let mut build_image = crate::DOCKER.build_image(
         BuildImageOptions {
             dockerfile: "Dockerfile",
-            t: image,
+            t: &artifact.image,
             ..Default::default()
         },
         None,
-        Some(tar.into()),
+        Some(artifact.tarball.into()),
     );
     while let Some(build_result) = build_image.next().await {
         match build_result {
-            Ok(build_result) => {
-                println!("{:?}", build_result);
-            }
-            Err(e) => {
-                whatever!("{:?}", e);
-            }
+            Ok(build_result) => println!("{:?}", build_result),
+            Err(e) => whatever!("{:?}", e),
         }
     }
     Ok(())
@@ -76,9 +38,23 @@ pub async fn launch_env(container: &str, image: &str) -> Result<(), Whatever> {
     let config = Config {
         image: Some(image),
         exposed_ports: Some({
-            let mut map = std::collections::HashMap::new();
-            map.insert("22/tcp", std::collections::HashMap::new());
-            map
+            let mut m = std::collections::HashMap::new();
+            m.insert("22/tcp", std::collections::HashMap::new());
+            m
+        }),
+        host_config: Some(bollard::models::HostConfig {
+            port_bindings: Some(
+                vec![(
+                    "22/tcp".to_string(),
+                    Some(vec![bollard::models::PortBinding {
+                        host_ip: None,
+                        host_port: Some("20221".to_string()),
+                    }]),
+                )]
+                .into_iter()
+                .collect(),
+            ),
+            ..Default::default()
         }),
         ..Default::default()
     };

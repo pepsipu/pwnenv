@@ -1,11 +1,16 @@
-pub mod builder;
-pub mod docker;
-pub mod opts;
-pub mod tools;
-pub mod config;
-
 #[macro_use]
 extern crate lazy_static;
+
+pub mod builder;
+pub mod config;
+pub mod docker;
+pub mod opts;
+pub mod ssh;
+pub mod tools;
+
+lazy_static! {
+    pub static ref DOCKER: bollard::Docker = get_docker();
+}
 
 fn get_docker() -> bollard::Docker {
     let docker = bollard::Docker::connect_with_local_defaults();
@@ -16,27 +21,3 @@ fn get_docker() -> bollard::Docker {
         }
     }
 }
-
-lazy_static! {
-    pub static ref DOCKER: bollard::Docker = get_docker();
-}
-
-// lazy_static! {
-//     pub static ref DOCKER: Mutex<Option<Docker>> = Mutex::new(None);
-// }
-
-// pub fn connect_docker() -> Result<Docker, Box<dyn std::error::Error>> {
-//     let docker = Docker::connect_with_local_defaults()?;
-//     Ok(docker)
-// }
-
-// pub fn get_docker() -> &'static Option<Docker> {
-//     match &*DOCKER {
-//         Some(docker) => &DOCKER,
-//         None => {
-//             let docker = connect_docker().unwrap();
-//             *DOCKER = Some(docker);
-//             &DOCKER
-//         }
-//     }
-// }
