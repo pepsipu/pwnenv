@@ -59,11 +59,18 @@ pub fn get_ssh_privkey() -> PathBuf {
 pub fn exec_ssh(username: &str, port: u16) {
     let path = get_ssh_privkey();
     let path = path.to_str().unwrap();
+    // also add -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
     std::process::Command::new("ssh")
-        .arg(format!("{}@localhost", username))
-        .arg("-p")
-        .arg(format!("{}", port))
-        .arg("-i")
-        .arg(path)
+        .args(&[
+            &format!("{}@localhost", username),
+            "-p",
+            &format!("{}", port),
+            "-i",
+            path,
+            "-o",
+            "StrictHostKeyChecking=no",
+            "-o",
+            "UserKnownHostsFile=/dev/null",
+        ])
         .exec();
 }

@@ -1,17 +1,18 @@
 #[macro_use]
 extern crate lazy_static;
+use clap::Parser;
 
 pub mod builder;
 pub mod config;
 pub mod docker;
 pub mod opts;
 pub mod ssh;
-pub mod tools;
 
 pub mod modules;
 
 lazy_static! {
     pub static ref DOCKER: bollard::Docker = get_docker();
+    pub static ref OPTS: opts::Opts = opts::Opts::parse();
 }
 
 fn get_docker() -> bollard::Docker {

@@ -1,6 +1,6 @@
 use crate::builder::Builder;
 
-mod apt;
+mod base;
 mod ssh;
 
-pub const MODULES: &[fn(Builder) -> Builder] = &[apt::add_apt, ssh::add_ssh];
+pub const MODULES: &[fn(Builder) -> Builder] = &[base::add_base, ssh::add_ssh];

@@ -1,6 +1,4 @@
-use std::path::Path;
-
-use dockerfile::{Cmd, Copy, Dockerfile, DockerfileBuilder, Run};
+use dockerfile::{Dockerfile, DockerfileBuilder};
 
 // list of functions that take a builder and return a builder
 
@@ -16,7 +14,7 @@ pub struct Artifact {
     pub tarball: Vec<u8>,
 }
 
-fn add_file<W>(tar: &mut tar::Builder<W>, path: &str, content: &[u8])
+pub fn add_file<W>(tar: &mut tar::Builder<W>, path: &str, content: &[u8])
 where
     W: std::io::Write,
 {
@@ -42,10 +40,6 @@ impl Builder {
     {
         self.dockerfile = f(self.dockerfile);
         self
-    }
-
-    pub fn apt_update(self) -> Self {
-        self.update_df(|df| df.push(Run::new("apt-get update")))
     }
 
     pub fn build(mut self) -> Artifact {
