@@ -1,6 +1,5 @@
 use pwnenv::builder;
 use pwnenv::docker;
-use pwnenv::opts::Opts;
 use pwnenv::ssh;
 
 #[tokio::main]

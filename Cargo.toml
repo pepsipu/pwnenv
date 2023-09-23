@@ -1,8 +1,16 @@
 [package]
 name = "pwnenv"
+authors = ["pepsipu <pepsi@pepsi.pw>"]
 version = "0.1.0"
 edition = "2021"
 description = "pwn environment management tool"
+license = "MIT"
+repository = "https://github.com/pepsipu/pwnenv"
+readme = "README.md"
+keywords = ["pwn", "ctf", "docker"]
+categories = ["security", "utilities"]
+homepage = "https://pepsi.pw"
+documentation = "https://github.com/pepsipu/pwnenv"
 
 # See more keys and their definitions at https://doc.rust-lang.org/cargo/reference/manifest.html
 

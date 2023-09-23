@@ -1,5 +1,4 @@
 use crate::config;
-use std::fmt::format;
 use std::fs::OpenOptions;
 use std::os::unix::process::CommandExt;
 use std::path::PathBuf;

@@ -56,6 +56,8 @@ pub async fn launch_env(container: &str, image: &str) -> Result<(), Whatever> {
         exposed_ports: Some(exposed_ports),
         host_config: Some(HostConfig {
             port_bindings: Some(port_bindings),
+            security_opt: Some(vec!["seccomp=unconfined".to_string()]),
+            cap_add: Some(vec!["SYS_PTRACE".to_string()]),
             ..Default::default()
         }),
         ..Default::default()
