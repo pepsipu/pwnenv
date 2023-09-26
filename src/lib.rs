@@ -6,7 +6,6 @@ pub mod builder;
 pub mod config;
 pub mod docker;
 pub mod opts;
-pub mod ssh;
 
 pub mod modules;
 

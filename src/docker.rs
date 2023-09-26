@@ -8,6 +8,7 @@ use snafu::{prelude::*, Whatever};
 
 use bollard::models::{HostConfig, PortBinding};
 use std::collections::HashMap;
+use std::os::unix::process::CommandExt;
 
 pub async fn build_docker(artifact: builder::Artifact) -> Result<(), Whatever> {
     let mut build_image = crate::DOCKER.build_image(
@@ -21,8 +22,8 @@ pub async fn build_docker(artifact: builder::Artifact) -> Result<(), Whatever> {
     );
     while let Some(build_result) = build_image.next().await {
         match build_result {
-            // Ok(build_result) => println!("{:?}", build_result),
-            Ok(_) => (),
+            Ok(build_result) => println!("{:?}", build_result),
+            // Ok(_) => (),
             Err(e) => whatever!("{:?}", e),
         }
     }
@@ -78,4 +79,16 @@ pub async fn launch_env(container: &str, image: &str) -> Result<(), Whatever> {
         }
     }
     Ok(())
+}
+
+pub fn exec_shell(container: &str) {
+        // also add -o StrictHostKeyChecking=no -o UserKnownHostsFile=/dev/null
+        std::process::Command::new("docker")
+            .args(&[
+                "exec",
+                "-it",
+                container,
+                "bash",
+            ])
+            .exec();
 }
